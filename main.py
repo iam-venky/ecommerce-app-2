@@ -4,34 +4,32 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Ecommerce App")
 
-# Your original data structures
+# Upgraded inventory with images and more products
 PRODUCTS = {
-    1: {"name": "Laptop", "price": 10000},
-    2: {"name": "Smartphone", "price": 5000},
-    3: {"name": "Watch", "price": 1000},
-    4: {"name": "TV", "price": 2000},
+    1: {"name": "Pro Laptop", "price": 1200, "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&q=80"},
+    2: {"name": "Smartphone X", "price": 899, "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=80"},
+    3: {"name": "Smart Watch", "price": 250, "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&q=80"},
+    4: {"name": "4K Ultra TV", "price": 950, "image": "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&q=80"},
+    5: {"name": "Noise-Cancelling Headphones", "price": 300, "image": "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400&q=80"},
+    6: {"name": "Mechanical Keyboard", "price": 130, "image": "https://images.unsplash.com/photo-1595225476474-87563907a212?w=400&q=80"},
 }
 cart = {}
 
-# Validates data coming from the frontend
 class CartItem(BaseModel):
     product_id: int
     quantity: int
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend():
-    """Serves the HTML frontend to the browser."""
     with open("index.html", "r") as f:
         return f.read()
 
 @app.get("/products")
 def get_products():
-    """Replaces display_products()"""
     return PRODUCTS
 
 @app.post("/cart")
 def add_to_cart(item: CartItem):
-    """Replaces add_to_cart()"""
     if item.product_id not in PRODUCTS:
         raise HTTPException(status_code=404, detail="Invalid product ID!")
     if item.quantity <= 0:
@@ -45,21 +43,17 @@ def add_to_cart(item: CartItem):
             "price": PRODUCTS[item.product_id]["price"],
             "quantity": item.quantity,
         }
-
-    return {"message": f"Added {item.quantity} x {PRODUCTS[item.product_id]['name']} to your cart!"}
+    return {"message": "Success"}
 
 @app.get("/cart")
 def view_cart():
-    """Replaces view_cart()"""
     total = sum(item["price"] * item["quantity"] for item in cart.values())
     return {"items": cart, "total": total}
 
 @app.post("/checkout")
 def checkout():
-    """Replaces checkout() and cart_clear()"""
     global cart
     if not cart:
-        raise HTTPException(status_code=400, detail="Your cart is empty! Add items before checking out.")
-    
+        raise HTTPException(status_code=400, detail="Your cart is empty!")
     cart.clear()
-    return {"message": "Thank you for shopping with us!"}
+    return {"message": "Payment successful! Thank you for your order."}
