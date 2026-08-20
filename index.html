@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce App</title>
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            color: #333; 
+        }
+        .layout { 
+            display: flex; 
+            gap: 30px; 
+            margin-top: 20px; 
+        }
+        .products-section { 
+            flex: 2; 
+        }
+        .cart-section { 
+            flex: 1; 
+            background: #f4f4f5; 
+            padding: 20px; 
+            border-radius: 8px; 
+            height: fit-content; 
+        }
+        .product-card { 
+            border: 1px solid #e4e4e7; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        button { 
+            background: #2563eb; 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 500;
+        }
+        button:hover { 
+            background: #1d4ed8; 
+        }
+        .checkout-btn { 
+            width: 100%; 
+            background: #16a34a; 
+            padding: 12px; 
+            margin-top: 15px; 
+            font-size: 16px; 
+        }
+        .checkout-btn:hover { 
+            background: #15803d; 
+        }
+        .cart-item { 
+            display: flex; 
+            justify-content: space-between; 
+            border-bottom: 1px solid #e4e4e7; 
+            padding: 10px 0; 
+        }
+        .empty-cart {
+            color: #71717a;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Ecommerce App</h1>
+    
+    <div class="layout">
+        <!-- Products Section -->
+        <div class="products-section">
+            <h2>Available Products</h2>
+            <div id="products-list">Loading products...</div>
+        </div>
+        
+        <!-- Cart Section -->
+        <div class="cart-section">
+            <h2>Your Cart</h2>
+            <div id="cart-list"></div>
+            <h3 id="cart-total" style="text-align: right; margin-top: 15px;">Total: $0</h3>
+            <button class="checkout-btn" onclick="checkout()">Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        // Load products from FastAPI when the page loads
+        async function loadProducts() {
+            try {
+                const response = await fetch('/products');
+                const products = await response.json();
+                
+                let html = '';
+                for (const [id, details] of Object.entries(products)) {
+                    html += `
+                        <div class="product-card">
+                            <div>
+                                <strong>${details.name}</strong><br>
+                                $${details.price}
+                            </div>
+                            <button onclick="addToCart(${id})">Add to Cart</button>
+                        </div>
+                    `;
+                }
+                document.getElementById('products-list').innerHTML = html;
+            } catch (error) {
+                document.getElementById('products-list').innerHTML = '<p style="color: red;">Failed to load products.</p>';
+            }
+        }
+
+        // Load cart data from FastAPI
+        async function loadCart() {
+            try {
+                const response = await fetch('/cart');
+                const data = await response.json();
+                
+                let html = '';
+                if (Object.keys(data.items).length === 0) {
+                    html = '<p class="empty-cart">Your cart is empty!</p>';
+                } else {
+                    for (const [id, item] of Object.entries(data.items)) {
+                        const subtotal = item.price * item.quantity;
+                        html += `
+                            <div class="cart-item">
+                                <span>${item.quantity}x ${item.name}</span>
+                                <span>$${subtotal}</span>
+                            </div>
+                        `;
+                    }
+                }
+                
+                document.getElementById('cart-list').innerHTML = html;
+                document.getElementById('cart-total').innerText = `Total: $${data.total}`;
+            } catch (error) {
+                console.error("Failed to load cart:", error);
+            }
+        }
+
+        // Send a new item to FastAPI
+        async function addToCart(productId) {
+            try {
+                const response = await fetch('/cart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product_id: productId, quantity: 1 })
+                });
+                
+                if (response.ok) {
+                    loadCart(); // Refresh the cart UI automatically
+                } else {
+                    const result = await response.json();
+                    alert(result.detail || "Failed to add item.");
+                }
+            } catch (error) {
+                alert("An error occurred while adding to cart.");
+            }
+        }
+
+        // Trigger the checkout process on FastAPI
+        async function checkout() {
+            try {
+                const response = await fetch('/checkout', { method: 'POST' });
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(result.message); // Show success message
+                    loadCart();            // Empty the cart UI
+                } else {
+                    alert(result.detail);  // Show error (e.g., cart is empty)
+                }
+            } catch (error) {
+                alert("An error occurred during checkout.");
+            }
+        }
+
+        // Initialize the app by fetching initial data
+        loadProducts();
+        loadCart();
+    </script>
+</body>
+</html>
