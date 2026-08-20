@@ -3,94 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecommerce App</title>
+    <title>TechStore | Modern Ecommerce</title>
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+        
         body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            max-width: 900px; 
-            margin: 0 auto; 
-            padding: 20px; 
-            color: #333; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background-color: var(--bg-color);
+            margin: 0; 
+            color: var(--text-main); 
         }
-        .layout { 
-            display: flex; 
-            gap: 30px; 
-            margin-top: 20px; 
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: var(--card-bg);
+            padding: 20px 5%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .products-section { 
-            flex: 2; 
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--primary);
         }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 5%;
+            display: flex;
+            gap: 40px;
+        }
+        .products-section { flex: 3; }
         .cart-section { 
             flex: 1; 
-            background: #f4f4f5; 
-            padding: 20px; 
-            border-radius: 8px; 
-            height: fit-content; 
+            min-width: 300px;
         }
+
+        /* Product Grid */
+        #products-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        
         .product-card { 
-            border: 1px solid #e4e4e7; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-bottom: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+            background: var(--card-bg);
+            border-radius: 12px; 
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
         }
-        button { 
-            background: #2563eb; 
-            color: white; 
-            border: none; 
-            padding: 8px 16px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: 500;
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
         }
-        button:hover { 
-            background: #1d4ed8; 
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
         }
-        .checkout-btn { 
-            width: 100%; 
-            background: #16a34a; 
-            padding: 12px; 
-            margin-top: 15px; 
-            font-size: 16px; 
+        .product-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
-        .checkout-btn:hover { 
-            background: #15803d; 
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        /* Cart Styles */
+        .cart-container {
+            background: var(--card-bg);
+            padding: 25px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 100px;
+        }
+        .cart-container h2 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 10px;
         }
         .cart-item { 
             display: flex; 
             justify-content: space-between; 
-            border-bottom: 1px solid #e4e4e7; 
-            padding: 10px 0; 
+            border-bottom: 1px solid #e2e8f0; 
+            padding: 15px 0; 
         }
-        .empty-cart {
-            color: #71717a;
-            font-style: italic;
+        .cart-item-title {
+            font-weight: 500;
         }
+
+        /* Buttons */
+        button { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        button:hover { background: var(--primary-hover); }
+        
+        .checkout-btn { 
+            background: #10b981; 
+            margin-top: 20px; 
+            font-size: 16px; 
+            padding: 15px;
+        }
+        .checkout-btn:hover { background: #059669; }
+        
+        .empty-cart { color: var(--text-muted); text-align: center; padding: 20px 0; }
     </style>
 </head>
 <body>
-    <h1>Welcome to Ecommerce App</h1>
+    <nav class="navbar">
+        <h1>TechStore</h1>
+        <div>🛒 Cart</div>
+    </nav>
     
-    <div class="layout">
+    <div class="container">
         <!-- Products Section -->
         <div class="products-section">
-            <h2>Available Products</h2>
-            <div id="products-list">Loading products...</div>
+            <h2 style="margin-top: 0; margin-bottom: 25px;">Trending Products</h2>
+            <div id="products-list">Loading inventory...</div>
         </div>
         
         <!-- Cart Section -->
         <div class="cart-section">
-            <h2>Your Cart</h2>
-            <div id="cart-list"></div>
-            <h3 id="cart-total" style="text-align: right; margin-top: 15px;">Total: $0</h3>
-            <button class="checkout-btn" onclick="checkout()">Checkout</button>
+            <div class="cart-container">
+                <h2>Order Summary</h2>
+                <div id="cart-list"></div>
+                <h3 id="cart-total" style="text-align: right; margin-top: 20px; font-size: 22px;">Total: $0</h3>
+                <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Load products from FastAPI when the page loads
         async function loadProducts() {
             try {
                 const response = await fetch('/products');
@@ -100,11 +180,12 @@
                 for (const [id, details] of Object.entries(products)) {
                     html += `
                         <div class="product-card">
-                            <div>
-                                <strong>${details.name}</strong><br>
-                                $${details.price}
+                            <img src="${details.image}" alt="${details.name}" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">${details.name}</h3>
+                                <div class="product-price">$${details.price}</div>
+                                <button onclick="addToCart(${id})">Add to Cart</button>
                             </div>
-                            <button onclick="addToCart(${id})">Add to Cart</button>
                         </div>
                     `;
                 }
@@ -114,7 +195,6 @@
             }
         }
 
-        // Load cart data from FastAPI
         async function loadCart() {
             try {
                 const response = await fetch('/cart');
@@ -122,13 +202,13 @@
                 
                 let html = '';
                 if (Object.keys(data.items).length === 0) {
-                    html = '<p class="empty-cart">Your cart is empty!</p>';
+                    html = '<p class="empty-cart">Your cart is feeling a little empty.</p>';
                 } else {
                     for (const [id, item] of Object.entries(data.items)) {
                         const subtotal = item.price * item.quantity;
                         html += `
                             <div class="cart-item">
-                                <span>${item.quantity}x ${item.name}</span>
+                                <span class="cart-item-title">${item.quantity}x ${item.name}</span>
                                 <span>$${subtotal}</span>
                             </div>
                         `;
@@ -142,7 +222,6 @@
             }
         }
 
-        // Send a new item to FastAPI
         async function addToCart(productId) {
             try {
                 const response = await fetch('/cart', {
@@ -152,7 +231,7 @@
                 });
                 
                 if (response.ok) {
-                    loadCart(); // Refresh the cart UI automatically
+                    loadCart(); 
                 } else {
                     const result = await response.json();
                     alert(result.detail || "Failed to add item.");
@@ -162,24 +241,22 @@
             }
         }
 
-        // Trigger the checkout process on FastAPI
         async function checkout() {
             try {
                 const response = await fetch('/checkout', { method: 'POST' });
                 const result = await response.json();
                 
                 if (response.ok) {
-                    alert(result.message); // Show success message
-                    loadCart();            // Empty the cart UI
+                    alert(result.message); 
+                    loadCart();            
                 } else {
-                    alert(result.detail);  // Show error (e.g., cart is empty)
+                    alert(result.detail);  
                 }
             } catch (error) {
                 alert("An error occurred during checkout.");
             }
         }
 
-        // Initialize the app by fetching initial data
         loadProducts();
         loadCart();
     </script>
